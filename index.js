@@ -27,6 +27,7 @@ if (!fs.existsSync(BASE_DIR)) {
 }
 app.post("/create", async function (req, res) {
   const { repoUrl } = req.body;
+  console.log(repoUrl);
 
   if (!repoUrl) {
     return res.status(400).json({ error: "Missing repoUrl in request body" });
