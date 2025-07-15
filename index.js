@@ -1,16 +1,23 @@
 // server/index.js
 const express = require('express');
-const axios = require('axios');
+
 const cors = require('cors');
-
+const path = require('path');
 const app = express();
-app.use(express.json());
 
+let bodyParser = require('body-parser');
+
+let fs = require('fs');
 app.use(
     cors({
         origin: '*',
     })
 );
+
+app.use(express.json());
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
 const BASE_DIR = path.join(__dirname, "tmp");
 
 if (!fs.existsSync(BASE_DIR)) {
@@ -69,4 +76,4 @@ app.post("/create", async function (req, res) {
 });
 
 
-app.listen(8000, () => console.log('OAuth server running on http://localhost:8000'));
+app.listen(8000, () => console.log('server running on http://localhost:8000'));
