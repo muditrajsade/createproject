@@ -41,31 +41,39 @@ app.post("/create", async function (req, res) {
   const projectPath = path.join(BASE_DIR, repoName);
 
   try {
-    // Step 1: Clone the repo
+    // 🔄 Step 1: Clone the repo
     console.log("📥 Cloning repo...");
     execSync(`git clone ${repoUrl}`, {
       cwd: BASE_DIR,
       stdio: "inherit",
     });
 
-    // Step 2: Create React app *inside the cloned folder*
-    console.log("⚛️ Creating React app in cloned repo...");
+    // ⚛️ Step 2: Create React app inside cloned folder
+    console.log("⚛️ Installing React app in cloned repo...");
     execSync(`npx create-react-app .`, {
-      cwd: projectPath, // creates React in-place
+      cwd: projectPath,
       stdio: "inherit",
     });
 
-    // Step 3: Git commit & push
+    // 📄 Step 2.1: Create .gitignore
+    console.log("📄 Creating .gitignore...");
+    fs.writeFileSync(path.join(projectPath, ".gitignore"), "/node_modules\n", "utf8");
+
+    // 🗑️ Step 2.5: Remove node_modules before commit
+    console.log("🧼 Removing node_modules before commit...");
+    execSync("rm -rf node_modules", { cwd: projectPath });
+
+    // ✅ Step 3: Commit and push
     console.log("🚀 Pushing React app to GitHub...");
     execSync("git add .", { cwd: projectPath });
     execSync(`git commit -m "Add React app from EC2"`, { cwd: projectPath });
     execSync("git push", { cwd: projectPath });
 
-    // Step 4: Cleanup
-    console.log("🧹 Cleaning up...");
+    // 🧹 Step 4: Cleanup
+    console.log("🧹 Cleaning up temp folder...");
     fs.rmSync(projectPath, { recursive: true, force: true });
 
-    res.status(200).json({ success: true, message: "React app created inside cloned repo and pushed." });
+    res.status(200).json({ success: true, message: "React app created and pushed to GitHub." });
   } catch (err) {
     console.error("❌ Error:", err.message);
 
