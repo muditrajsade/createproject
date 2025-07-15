@@ -1,30 +1,21 @@
 // server/index.js
 const express = require('express');
-
 const cors = require('cors');
 const path = require('path');
 const { execSync } = require("child_process");
-
 const app = express();
+const bodyParser = require('body-parser');
+const fs = require('fs');
 
-let bodyParser = require('body-parser');
-
-let fs = require('fs');
-app.use(
-    cors({
-        origin: '*',
-    })
-);
-
+app.use(cors({ origin: '*' }));
 app.use(express.json());
-
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const BASE_DIR = path.join(__dirname, "tmp");
-
 if (!fs.existsSync(BASE_DIR)) {
   fs.mkdirSync(BASE_DIR);
 }
+
 app.post("/create", async function (req, res) {
   const { repoUrl } = req.body;
   console.log(repoUrl);
@@ -64,6 +55,13 @@ app.post("/create", async function (req, res) {
     console.log("🧼 Removing node_modules before commit...");
     execSync("rm -rf node_modules", { cwd: projectPath });
 
+    // 🔑 ✅ Step 2.6: Set remote URL with token again before push
+    console.log("🔑 Resetting origin with token-authenticated URL...");
+    execSync(`git remote set-url origin ${repoUrl}`, {
+      cwd: projectPath,
+      stdio: "inherit",
+    });
+
     // ✅ Step 3: Commit and push
     console.log("🚀 Pushing React app to GitHub...");
     execSync("git add .", { cwd: projectPath });
@@ -85,6 +83,5 @@ app.post("/create", async function (req, res) {
     res.status(500).json({ success: false, error: err.message });
   }
 });
-
 
 app.listen(8000, () => console.log('server running on http://localhost:8000'));
