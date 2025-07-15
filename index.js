@@ -56,9 +56,9 @@ app.post("/create", async function (req, res) {
     execSync("rm -rf node_modules", { cwd: projectPath });
 
     // 🔑 ✅ Step 2.6: Set remote URL with token again before push
-    let authedurl = 'https://muditrajsade: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@github.com/muditrajsade/sample.git';
+ 
     console.log("🔑 Resetting origin with token-authenticated URL...");
-    execSync(`git remote set-url origin ${authedurl}`, {
+    execSync(`git remote set-url origin ${repoUrl}`, {
       cwd: projectPath,
       stdio: "inherit",
     });
